@@ -1,0 +1,58 @@
+header{
+    width: calc(100vw - 4px);
+    margin: 0;
+    padding: 0;
+    border: black 2px solid;
+    background-color: lightblue;
+    display: flex;
+    gap: 10px;
+}
+
+.headerButton{
+    width: 300px;
+    height: 40px;
+    margin: 5px 5px 0 5px;
+    border-left: solid blue 1px;
+    border-top: solid blue 1px;
+    border-right: solid blue 1px;
+    border-radius: 5px 5px 0 0;
+    background-color: gainsboro;
+    cursor: pointer;
+}
+
+.clicked{
+    background-color: gray;
+    cursor: not-allowed;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#visualization-container{
+    width: 100vw;
+    height: calc(100vh - 100px - 8px - 5px);
+}
+
+#summary-container{
+    width: 95vw;
+    margin: 5px 2.5vw;
+}
+
+#LOC-container{
+    width: 95vw;
+    margin: 5px 2.5vw;
+}
+
+.hidden{
+    display: none;
+}
+
+footer{
+    width: calc(100vw - 4px);
+    height: 50px;
+    margin: 0;
+    border: black 2px solid;
+    background-color: lightblue;
+}

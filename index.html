@@ -18,11 +18,14 @@
             <h2>Summary View</h2>
         </div>
     </header>
-    <body onload="sleep(50).then(() => { initialize()});">
+    <body onload="sleep(250).then(() => { initialize()});">
         <div id="visualization-container">   
             <div id="LOC-container">
                 <div id="LOC-panel-top">
-                    <div id="question-selection-container">Question to Visualize: <select id = "questionList" onchange = "createIndividualVisualization()"></select></div>
+                    <div id="question-selection-container">
+                        <h3 class="no-padding-no-margin">Question to Visualize:</h3>
+                        <select id = "questionList" onchange = "createIndividualVisualization()"></select>
+                    </div>
                     <div id="LOC-legend"></div>
                 </div>
                 <div id="LOC-panel-bottom">

@@ -8,6 +8,7 @@ let shapeDictionary,questionData;
 locVisualization = d3.select("#LOC-visualization")
 clickVisualization = d3.select("#click-visualization")
 breakdownVisualization = d3.select("#breakdown-visualization")
+locLegend = d3.select("#LOC-legend")
 basicErrVisualization = d3.select("#basic-error-visualization")
 typeErrVisualization = d3.select("#type-error-visualization")
 channelsUsedVisualization = d3.select("#channels-used-visualization")
@@ -113,6 +114,29 @@ function createIndividualVisualization(){
         .attr("width", breakdownWidth-12)
         .attr("height", (breakdownHeight)/(questionData.length))
         .style("fill", d => colorForCodeTypes(d.CodeType))
+
+    var legendSvg = locLegend.append('svg')
+        .attr('height', 50)
+        .attr('width', 500);
+
+    var legendElem = legendSvg.selectAll("g")
+        .data(discrepancies)
+
+    var legendElemEnter = legendElem.enter()
+        .append('g')
+        .attr("transform",function(d,i){return "translate(" + (((500)/(Array.from(discrepancies).length))*i+10) + ",0)"})
+
+    legendElemEnter.append("svg:image")
+        .attr("width", 20)
+        .attr('height',20)
+        .attr("y",5)
+        .attr("xlink:href",d=>shapeDictionary[d])
+
+    
+    legendElemEnter.append('text')
+        .attr('dx',30)
+        .attr('dy',20)
+        .text(d => d)
 }
 
 function initialize(){

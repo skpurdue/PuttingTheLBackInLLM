@@ -6,9 +6,8 @@ let codeTypes,discrepancies,questions = {};
 let discrepancy,noDiscrepancy,notPrompted;
 let shapeDictionary,questionData;
 
-let chartTypes, channelsOnly, allUsedChannels;
-let channelCounts, maxChannelCount, errorTypes;
-let errorsOnly, visProducedErrors, finalErrorList, errorsByChart;
+let maxAllErrorsCount,errorTypes,chartTypes,maxErrorCount;
+let maxChannelCount,allUsedChannels_unique;
 
 
 locVisualization = d3.select("#LOC-visualization")
@@ -134,7 +133,7 @@ function createIndividualVisualization(){
 }
 
 function createSummaryVisualization(){
-
+    
 }
 
 function initialize(){
@@ -208,7 +207,36 @@ function initialize(){
     createIndividualVisualization()
 
     chartTypes = new Set(data.map(d=>d.VisProduced))
+    channelsOnly = data.map(d=>({Channel1:d.Channel1,Channel2:d.Channel2,Channel3:d.Channel3,Channel4:d.Channel4})).filter(j=>j.Channel1!=="N/A")
+    allUsedChannels = channelsOnly.map(d=>([d.Channel1,d.Channel2,d.Channel3,d.Channel4])).flat().filter(d=>d!=="No Extra")
+    allUsedChannels_unique = new Set(allUsedChannels)
+    channelCounts = d3.rollups(allUsedChannels, group => group.length, d => d)
+    maxChannelCount = d3.max(channelCounts, d => d[1])
+    errorTypes = ["Ordinal","LabelFormatting","Overplotting","TextOverlap","Filtering","DescriptiveStats","VizIdiomMismatch","ChartJunk"]
+    errorsOnly = data.filter(d=>d.AllErrors!==",,,,,,,")
+    visProducedErrors = errorsOnly.map(d=>({"type":d.VisProduced,errors:d.AllErrors.split(",").filter(j=>j!=="")}))
+    finalErrorList = visProducedErrors.map(d=>d.errors.map(j=>({type:d.type,error:j}))).flat()
+    errorsByChart = d3.rollup(
+        finalErrorList,
+        group => group.length,
+        codeLine => codeLine.type,
+        codeLine => codeLine.error
+    )
+    errorColors = d3.scaleOrdinal()
+        .domain(errorTypes)
+        .range(['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0','#f0027f','#bf5b17','#666666'])
 
+    maxErrorCount = d3.max(
+        errorsByChart,
+        ([type, errors]) => d3.max(errors, ([error, count]) => count)
+    )
+
+    errorCounts =  d3.rollups(finalErrorList, group => group.length, d => d.error)
+    maxAllErrorsCount = d3.max(errorCounts, d => d[1])
+
+    colorForCodeTypes = d3.scaleOrdinal()
+        .domain(s)
+        .range(d3.schemeTableau10)
 }
 
 function sleep(ms) {

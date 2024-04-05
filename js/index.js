@@ -13,6 +13,9 @@ basicErrVisualization = d3.select("#basic-error-visualization")
 typeErrVisualization = d3.select("#type-error-visualization")
 channelsUsedVisualization = d3.select("#channels-used-visualization")
 
+legendWidth = 700
+
+colors = ['#7fc97f','#beaed4','#fdc086','#ffff99','#386cb0','#f0027f','#bf5b17','#666666']
 
 function toggleView(button){
     if(button==="LOC" && !d3.select("#LOC-button").classed("clicked")){
@@ -47,7 +50,7 @@ function changeImage(question,line){
 
 function createIndividualVisualization(){
     locVisualization.html("")
-    questionIndex = document.getElementById("questionList").value
+    questionIndex = document.getElementById("question-list").value
     questionData = data.filter(d=> d.QuestionIndex == questionIndex)
     var elementHeight = questionData.length*50
     
@@ -114,33 +117,59 @@ function createIndividualVisualization(){
         .attr("width", breakdownWidth-12)
         .attr("height", (breakdownHeight)/(questionData.length))
         .style("fill", d => colorForCodeTypes(d.CodeType))
+        .attr("cursor","pointer")
 
     var legendSvg = locLegend.append('svg')
-        .attr('height', 50)
-        .attr('width', 500);
+        .attr('height', 75)
+        .attr('width', legendWidth);
 
-    var legendElem = legendSvg.selectAll("g")
+    var topLegend = legendSvg.append("g")
+
+    var topLegendElem = topLegend.selectAll("g")
         .data(discrepancies)
 
-    var legendElemEnter = legendElem.enter()
+    var topLegendElemEnter = topLegendElem.enter()
         .append('g')
-        .attr("transform",function(d,i){return "translate(" + (((500)/(Array.from(discrepancies).length))*i+10) + ",0)"})
+        .attr("transform",function(d,i){return "translate(" + (((legendWidth)/(Array.from(discrepancies).length))*i+1) + ",0)"})
 
-    legendElemEnter.append("svg:image")
+    topLegendElemEnter.append("svg:image")
         .attr("width", 20)
         .attr('height',20)
         .attr("y",5)
         .attr("xlink:href",d=>shapeDictionary[d])
 
+    topLegendElemEnter.append('text')
+        .attr('dx',30)
+        .attr('dy',20)
+        .text(d => d)
+
+    var bottomLegend = legendSvg.append("g")
     
-    legendElemEnter.append('text')
+
+    var bottomLegendElem = bottomLegend.selectAll("g")
+        .data(codeTypes)
+
+
+    var bottomLegendElemEnter = bottomLegendElem.enter()
+        .append('g')
+        .attr("transform",function(d,i){console.log(d,parseInt(i/4));return "translate(" + (((legendWidth)/(Array.from(codeTypes).length)*2)*((i)%4)+1) + "," + (25 * (parseInt(i/4)+1)) + ")"}) //This line is broken for elements 1-3, suggesting an issue with parse int?
+
+    bottomLegendElemEnter.append("rect")
+        .attr("width", 20)
+        .attr('height',20)
+        .attr("y",5)
+        .attr("stroke","black")
+        .attr("fill",d=>colorForCodeTypes(d))
+
+    bottomLegendElemEnter.append('text')
         .attr('dx',30)
         .attr('dy',20)
         .text(d => d)
 }
 
 function initialize(){
-    codeTypes = new Set(data.map(d=>d.CodeType))
+    codeTypes = Array.from(new Set(data.map(d=>d.CodeType)))
+    console.log(codeTypes)
     discrepancies = new Set(data.map(d=>d.Discrepancies))
     for(const row of data)
         if(questions[row.QuestionIndex]==undefined)
@@ -151,8 +180,8 @@ function initialize(){
     shapeDictionary = ({"No Discrepancy": noDiscrepancy, "Discrepancy":discrepancy, "Not Prompted":notPrompted})
     colorForCodeTypes = d3.scaleOrdinal()
         .domain(codeTypes)
-        .range(d3.schemeTableau10)
-    questionSelection = document.getElementById("questionList")
+        .range(colors)
+    questionSelection = document.getElementById("question-list")
     for(const [key, value] of Object.entries(questions)){
         var option = document.createElement("option");
         option.text = value;

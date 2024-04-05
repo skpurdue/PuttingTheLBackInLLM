@@ -18,6 +18,9 @@ header{
     border-radius: 5px 5px 0 0;
     background-color: gainsboro;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .clicked{
@@ -31,22 +34,81 @@ body {
 }
 
 #visualization-container{
-    width: 100vw;
-    height: calc(100vh - 100px - 8px - 5px);
+    width: calc(100vw - 10px);
+    height: calc(100vh - 114px);
+    padding: 5px;
 }
 
 #summary-container{
     width: 95vw;
-    margin: 5px 2.5vw;
+    display: flex;
+    height: 100%;
 }
 
 #LOC-container{
     width: 95vw;
-    margin: 5px 2.5vw;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
+#LOC-panel-top{
+    height: 30px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#LOC-panel-bottom{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    height: 100%;
+}
+
+#LOC-panel-right{
+    width: 30%;
+    height: 95%;
+}
+
+#LOC-visualization{
+    flex: 1;
+    height: 91.5%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 5px 0;
+    border: thin solid black;
+}
+
+#click-visualization{
+    height: 47.75%;
+    min-height: 45%;
+    max-height: 45%;
+    padding: 5px;
+    margin: 2.5% 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid black;
+}
+
+#image{
+    height: 85%;
+}
+
+
+#breakdown-visualization{
+    height: 47.75%;
+    margin: 2.5% 5px;
+    border: 1px solid black;
 }
 
 .hidden{
-    display: none;
+    display: none!important;
 }
 
 footer{

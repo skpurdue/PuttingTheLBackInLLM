@@ -7,23 +7,48 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="styles.css">
-        <script src=""></script>
+        <script src="js/d3.js"></script>
+        <script src="js/index.js" defer async></script>
     </head>
     <header>
-        <div id="LOC-button" class="headerButton clicked">
-            
+        <div id="LOC-button" class="headerButton clicked" onclick="toggleView('LOC')">
+            <h2>Individual View</h2>
         </div>
-        <div id="summary-button" class="headerButton">
-
+        <div id="summary-button" class="headerButton" onclick="toggleView('SUM')">
+            <h2>Summary View</h2>
         </div>
     </header>
-    <body>
+    <body onload="sleep(50).then(() => { initialize()});">
         <div id="visualization-container">   
             <div id="LOC-container">
-
+                <div id="LOC-panel-top">
+                    <select id = "questionList" onchange = "createIndividualVisualization()">  
+                        
+                    </select>  
+                </div>
+                <div id="LOC-panel-bottom">
+                    <div id="LOC-visualization"></div>
+                    <div id="LOC-panel-right">
+                        <div id="click-visualization">
+                            <h2 id="no-image" class="hidden">H</h2>
+                            <img id="image" src="images/placeholder.svg">
+                        </div>
+                        <div id="breakdown-visualization"></div>
+                    </div>
+                </div>
             </div>
             <div id="summary-container" class="hidden">
-
+                <div id="summary-panel-top">
+                    <div id="summary-panel-left">
+                        <div id="basic-error-visualization"></div>
+                    </div>
+                    <div id="summary-panel-right">
+                        <div id="channels-used-visualization"></div>
+                    </div>
+                </div>
+                <div id="summary-panel-bottom">
+                    <div id="type-error-visualization"></div>
+                </div>
             </div>
         </div>
     </body>

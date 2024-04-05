@@ -6,18 +6,18 @@ let codeTypes,discrepancies,questions = {};
 let discrepancy,noDiscrepancy,notPrompted;
 let shapeDictionary,questionData;
 
-let maxAllErrorsCount,errorTypes,chartTypes,maxErrorCount;
-let maxChannelCount,allUsedChannels_unique;
+let maxAllErrorsCount,errorTypes,chartTypes,maxErrorCount,errorCounts;
+let maxChannelCount,allUsedChannels_unique,errorColors;
 
 
-locVisualization = d3.select("#LOC-visualization")
-clickVisualization = d3.select("#click-visualization")
-breakdownVisualization = d3.select("#breakdown-visualization")
-locLegend = d3.select("#LOC-legend-visualization")
-basicErrVisualization = d3.select("#basic-error-visualization")
-typeErrVisualization = d3.select("#type-error-visualization")
-channelsUsedVisualization = d3.select("#channels-used-visualization")
-summaryLegend = d3.select("#summary-legend")
+const locVisualization = d3.select("#LOC-visualization")
+const clickVisualization = d3.select("#click-visualization")
+const breakdownVisualization = d3.select("#breakdown-visualization")
+const locLegend = d3.select("#LOC-legend-visualization")
+const basicErrVisualization = d3.select("#basic-error-visualization")
+const typeErrVisualization = d3.select("#type-error-visualization")
+const channelsUsedVisualization = d3.select("#channels-used-visualization")
+const summaryLegend = d3.select("#summary-legend")
 
 summaryCreated = false
 
@@ -31,15 +31,15 @@ function toggleView(button){
         d3.select("#LOC-button").classed("clicked",true)
         d3.select("#summary-container").classed("hidden",true)
         d3.select("#LOC-container").classed("hidden",false)
-        if(summaryCreated){
-            summaryCreated = true
-            createSummaryVisualization()
-        }
     } else if(button==="SUM" && !d3.select("#summary-button").classed("clicked")){
         d3.select("#summary-button").classed("clicked",true)
         d3.select("#LOC-button").classed("clicked",false)
         d3.select("#LOC-container").classed("hidden",true)
         d3.select("#summary-container").classed("hidden",false)
+        if(!summaryCreated){
+            summaryCreated = true
+            createSummaryVisualization()
+        }
     }
 }
 
@@ -133,7 +133,194 @@ function createIndividualVisualization(){
 }
 
 function createSummaryVisualization(){
+    var legendWidth = 625;
+    var legendSvg = summaryLegend.append('svg')
+        .attr('height', 50)
+        .attr('width', legendWidth);
     
+    legend = legendSvg.append("g")
+    
+
+    var legendElem = legend.selectAll("g")
+        .data(errorTypes)
+
+
+    var legendElemEnter = legendElem.enter()
+        .append('g')
+        .attr("transform",function(d,i){return "translate(" + (((legendWidth)/(Array.from(errorTypes).length)*2)*((i)%4)+15) + "," + ((25 * (parseInt(i/4)))) + ")"})
+
+    legendElemEnter.append("rect")
+        .attr("width", 20)
+        .attr('height',20)
+        .attr("y",5)
+        .attr("stroke","black")
+        .attr("fill",d=>errorColors(d))
+
+    legendElemEnter.append('text')
+        .attr('dx',25)
+        .attr('dy',20)
+        .text(d=>d)
+
+    var basicErrWidth = document.getElementById('basic-error-visualization').offsetWidth;
+    var basicErrHeight = document.getElementById('basic-error-visualization').offsetHeight;
+    var channelsWidth = document.getElementById('channels-used-visualization').offsetWidth;
+    var channelsHeight = document.getElementById('channels-used-visualization').offsetHeight;
+    var typeErrWidth = document.getElementById('type-error-visualization').offsetWidth;
+    var typeErrHeight = document.getElementById('type-error-visualization').offsetHeight;
+    marginChartsMiddle = ({top: 10, bottom: 45, left: 125, right: 10})
+    marginCharts = ({top: 10, bottom: 45, left: 125, right: 10})
+
+    yBasicErrors = d3.scaleLinear()
+        .domain([0, maxAllErrorsCount]).nice()
+        .range([basicErrHeight - marginChartsMiddle.bottom, marginChartsMiddle.top])
+    xBasicErrors = d3.scaleBand()
+        .domain(errorTypes)
+        .range([marginChartsMiddle.left, basicErrWidth - marginChartsMiddle.right])
+        .padding(0.1)
+    xAxisErrors = d3.axisBottom(xBasicErrors)
+    yAxisErrors = d3.axisLeft(yBasicErrors)
+    basicSvg = basicErrVisualization.append('svg')
+        .attr('width', basicErrWidth)
+        .attr('height', basicErrHeight);
+
+    basicSvg.append('g')
+        .selectAll('rect')
+        .data(errorCounts)
+        .join('rect')
+            .attr('x', d => xBasicErrors(d[0]))
+            .attr('width', xBasicErrors.bandwidth())
+            .attr('y', ([error, count]) => yBasicErrors(count))
+            .attr('height', ([error, count]) => yBasicErrors(0) - yBasicErrors(count))
+            .attr('fill', ([error, count]) => errorColors(error));
+
+    basicSvg.append('g')
+        .attr('transform', `translate(0,${basicErrHeight - marginChartsMiddle.bottom})`)
+        .call(xAxisErrors)
+        .append('text')
+            .attr('x', basicErrWidth / 2)
+            .attr('y', 30)
+            .attr('dominant-baseline', 'hanging')
+            .attr('text-align', 'middle')
+            .attr('fill', 'black')
+            .text('Error Type');
+  
+    basicSvg.append('g')
+        .attr('transform', `translate(${marginChartsMiddle.left})`)
+        .call(yAxisErrors.ticks(maxAllErrorsCount + 1).tickFormat(d3.format(".0f")))
+        .append('text')
+            .attr('x', -50)
+            .attr('y', basicErrHeight / 2)
+            .attr('dominant-baseline', 'middle')
+            .attr('text-align', 'end')
+            .attr('fill', 'black')
+            .text('Error Count');
+      
+    yChannel = d3.scaleLinear()
+        .domain([0, maxChannelCount]).nice()
+        .range([channelsHeight - marginChartsMiddle.bottom, marginChartsMiddle.top])
+    
+    xChannel = d3.scaleBand()
+        .domain(allUsedChannels_unique)
+        .range([marginChartsMiddle.left, channelsWidth - marginChartsMiddle.right])
+        .padding(0.1)
+
+    xAxisChannel = d3.axisBottom(xChannel)
+    yAxisChannel = d3.axisLeft(yChannel)
+
+    channelsSvg = channelsUsedVisualization.append('svg')
+        .attr('width', channelsWidth)
+        .attr('height', channelsHeight);
+
+
+
+    channelsSvg.append('g')
+        .selectAll('rect')
+        .data(channelCounts)
+        .join('rect')
+            .attr('x', d => xChannel(d[0]))
+            .attr('width', xChannel.bandwidth())
+            .attr('y', ([error, count]) => yChannel(count))
+            .attr('height', ([error, count]) => yChannel(0) - yChannel(count))
+            .attr('fill', "steelblue");
+
+    channelsSvg.append('g')
+        .attr('transform', `translate(0,${channelsHeight - marginChartsMiddle.bottom})`)
+        .call(xAxisChannel)
+        .append('text')
+            .attr('x', channelsWidth / 2)
+            .attr('y', 30)
+            .attr('dominant-baseline', 'hanging')
+            .attr('text-align', 'middle')
+            .attr('fill', 'black')
+            .text('Channel Used');
+
+    channelsSvg.append('g')
+        .attr('transform', `translate(${marginChartsMiddle.left})`)
+        .call(yAxisChannel.ticks(maxChannelCount + 1).tickFormat(d3.format(".0f")))
+        .append('text')
+        .attr('x', -50)
+        .attr('y', channelsHeight / 2)
+        .attr('dominant-baseline', 'middle')
+        .attr('text-align', 'end')
+        .attr('fill', 'black')
+        .text('Channel Count');
+
+    groupX = d3.scaleBand()
+        .domain(chartTypes)
+        .range([marginCharts.left, typeErrWidth - marginCharts.right])
+        .padding(0.1)
+
+    barX = d3.scaleBand()
+        .domain(errorTypes)
+        .range([0, groupX.bandwidth()])
+        .padding(0.1)
+
+    yCharts = d3.scaleLinear()
+        .domain([0, maxErrorCount]).nice()
+        .range([typeErrHeight - marginCharts.bottom, marginCharts.top])
+
+    xAxisCharts = d3.axisBottom(groupX)
+    yAxisCharts = d3.axisLeft(yCharts).ticks(2)
+
+    typesSvg = typeErrVisualization.append('svg')
+        .attr('width', typeErrWidth)
+        .attr('height', typeErrHeight);
+
+    const groups = typesSvg.selectAll('g')
+        .data(errorsByChart)
+        .join('g')
+            .attr('transform', ([chart, errors]) => `translate(${groupX(chart)})`);
+
+    groups.selectAll('rect')
+        .data(([chart, errors]) => errors)
+        .join('rect')
+            .attr('x', d => barX(d[0]))
+            .attr('width', barX.bandwidth())
+            .attr('y', ([error, count]) => yCharts(count))
+            .attr('height', ([error, count]) => yCharts(0) - yCharts(count))
+            .attr('fill', ([error, count]) => errorColors(error));
+
+    typesSvg.append('g')
+        .attr('transform', `translate(0,${typeErrHeight - marginCharts.bottom})`)
+        .call(xAxisCharts)
+    .append('text')
+        .attr('x', typeErrWidth / 2)
+        .attr('y', 30)
+        .attr('dominant-baseline', 'hanging')
+        .attr('text-align', 'middle')
+        .attr('fill', 'black')
+        .text('Chart Type');
+  
+    typesSvg.append('g')
+        .attr('transform', `translate(${marginCharts.left})`)
+        .call(yAxisCharts)
+    .append('text')
+        .attr('x', -50)
+        .attr('y', typeErrHeight / 2)
+        .attr('dominant-baseline', 'middle')
+        .attr('text-align', 'end')
+        .attr('fill', 'black')
+        .text('Error Count');
 }
 
 function initialize(){
@@ -190,7 +377,7 @@ function initialize(){
 
     var bottomLegendElemEnter = bottomLegendElem.enter()
         .append('g')
-        .attr("transform",function(d,i){return "translate(" + (((legendWidth)/(Array.from(codeTypes).length)*2)*((i)%4)+1) + "," + ((25 * (parseInt(i/4)+1))) + ")"}) //This line is broken for elements 1-3, suggesting an issue with parse int?
+        .attr("transform",function(d,i){return "translate(" + (((legendWidth)/(Array.from(codeTypes).length)*2)*((i)%4)+1) + "," + ((25 * (parseInt(i/4)+1))) + ")"})
 
     bottomLegendElemEnter.append("rect")
         .attr("width", 20)
@@ -233,10 +420,6 @@ function initialize(){
 
     errorCounts =  d3.rollups(finalErrorList, group => group.length, d => d.error)
     maxAllErrorsCount = d3.max(errorCounts, d => d[1])
-
-    colorForCodeTypes = d3.scaleOrdinal()
-        .domain(s)
-        .range(d3.schemeTableau10)
 }
 
 function sleep(ms) {

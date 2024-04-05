@@ -32,8 +32,9 @@ footer{
 
 #LOC-panel-top{
     min-height: 115px;
+    width: 100%;
     display: flex;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
 }
 
@@ -204,17 +205,25 @@ footer{
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 98%;
-    min-height: 60px;
-    max-height: 60px;
-    height: 60px;
+    width: 100%;
+    min-height: 90px;
+    max-height: 90px;
+    height: 90px;
     margin: 5px 1%; 
 }
 
-#summary-legend{
-    width: 50%;
-    height: 95%;
+#summary-legend-container{
+    width: 600px;
+    height: 100%;
     border: solid black 2px;
+    border-radius: 8px;
+}
+
+#summary-legend{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #summary-panel-middle{
@@ -222,15 +231,15 @@ footer{
     align-items: center;
     justify-content: space-evenly;
     width: 98%;
-    min-height: calc(50% - 25px);
-    max-height: calc(50% - 25px);
-    height: calc(50% - 25px);;
+    min-height: calc(50% - 40px);
+    max-height: calc(50% - 40px);
+    height: calc(50% - 40px);
     margin: 0 1% 5px 1%; 
     border-bottom: black solid 1px;
 }
 
 #barrier{
-    height: 50px;
+    height: 100%;
     background-color: black;
     width: 1px;
 }
@@ -238,13 +247,21 @@ footer{
 #summary-panel-left{
     width: 45%;
     height: 95%;
-    background-color: red;
+}
+
+#basic-error-visualization{
+    width: 100%;
+    height: 100%;
 }
 
 #summary-panel-right{
     width: 45%;
     height: 95%;
-    background-color: blue;
+}
+
+#channels-used-visualization{
+    width: 100%;
+    height: 100%;
 }
 
 #summary-panel-bottom{
@@ -252,11 +269,15 @@ footer{
     justify-content: center;
     align-items: center;
     width: 98%;
-    min-height: calc(50% - 25px);
-    max-height: calc(50% - 25px);
-    height: calc(50% - 25px);
+    min-height: calc(50% - 40px);
+    max-height: calc(50% - 40px);
+    height: calc(50% - 40px);
     margin: 0 1% 5px 1%;
-    background-color: red;
+}
+
+#type-error-visualization{
+    width: 100%;
+    height: 100%;
 }
 
 .hidden{

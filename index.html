@@ -23,24 +23,46 @@
             <div id="LOC-container">
                 <div id="LOC-panel-top">
                     <div id="question-selection-container">
-                        <h3 class="no-padding-no-margin">Question to Visualize:</h3>
-                        <select id = "question-list" onchange = "createIndividualVisualization()"></select>
+                        <h3 class="no-padding-no-margin container-header" id="question-selection-header">Choose the question whose code to visualize:</h3>
+                        <div id="question-list-container">
+                            <select id = "question-list" onchange = "createIndividualVisualization()"></select>
+                        </div>
                     </div>
-                    <div id="LOC-legend"></div>
+                    <div id="LOC-legend">
+                        <h3 class="no-padding-no-margin container-header" id="LOC-legend-header">Legend</h3>
+                        <div id="LOC-legend-visualization"></div>
+                    </div>
                 </div>
                 <div id="LOC-panel-bottom">
-                    <div id="LOC-visualization"></div>
-                    <div id="LOC-panel-right">
-                        <div id="click-visualization">
-                            <h2 id="no-image" class="hidden">H</h2>
-                            <img id="image" src="images/placeholder.svg">
+                    <div id="LOC-panel-left">
+                        <div id="LOC-visualization-container">
+                            <div id="LOC-visualization-header">
+                                <h2 class="no-padding-no-margin container-header">Generated Lines of Code (Clickable)</h2>
+                            </div>
+                            <div id="LOC-visualization"></div>
                         </div>
-                        <div id="breakdown-visualization"></div>
+                    </div>
+                    <div id="LOC-panel-right">
+                        <div id="click-visualization-container">
+                            <h3 class="no-padding-no-margin container-header" id="click-visualization-header">Line of Code, Visualized</h3>
+                            <div id="click-visualization">
+                                <h2 id="no-image" class="hidden"></h2>
+                                <img id="image" src="images/placeholder.svg">    
+                            </div>
+                        </div>
+                        <div id="breakdown-visualization-container">
+                            <h3 class="no-padding-no-margin container-header" id="breakdown-visualization-header">Breakdown Visualization (Clicklable)</h3>
+                            <div id="breakdown-visualization"></div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
             <div id="summary-container" class="hidden">
                 <div id="summary-panel-top">
+                    <div id="summary-legend"></div>
+                </div>
+                <div id="summary-panel-middle">
                     <div id="summary-panel-left">
                         <div id="basic-error-visualization"></div>
                     </div>
